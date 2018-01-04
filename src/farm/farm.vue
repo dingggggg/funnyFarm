@@ -1,20 +1,74 @@
 <template>
-    <div id="farm">
-        <div class="plantpot" v-for="t in message">
-            <!-- {{t}} -->
+    <div>
+        <div class="btn-group">
+            <Button type="primary" @click="setting = true">游戏设定</Button>
+            <Button type="primary" @click="unlock = true">解锁植物</Button>
+            <Button type="primary" @click="achievement = true">成就</Button>
+            <Button type="primary" @click="addLand = true">添加土地</Button>
         </div>
+
+
+        <div class="plantpot" v-for="t in message">
+            {{t}}
+        </div>
+
+        <Modal
+            v-model="setting"
+            title="Common Modal dialog box title"
+            @on-ok="ok"
+            @on-cancel="cancel">
+            <p>我是弹窗</p>
+
+        </Modal>
+
+        <Modal
+            v-model="unlock"
+            title="Common Modal dialog box title"
+            @on-ok="ok"
+            @on-cancel="cancel">
+            <p>我是弹窗</p>
+
+        </Modal>
+        <Modal
+            v-model="achievement"
+            title="Common Modal dialog box title"
+            @on-ok="ok"
+            @on-cancel="cancel">
+            <p>我是弹窗</p>
+
+        </Modal>
+        <Modal
+            v-model="addLand"
+            title="Common Modal dialog box title"
+            @on-ok="ok"
+            @on-cancel="cancel">
+            <p>我是弹窗</p>
+
+        </Modal>
     </div>
 </template>
 
 <script>
 /* eslint-disable */
 var test = {
-    message:[1,2,3,4,5,6,7]
+    message:[1,2,3,4,5,6,7],
+    setting:false,
+    unlock:false,
+    achievement:false,
+    addLand:false
 }
 export default {
     name: 'farm',
     data: function (){
         return test
+    },
+    methods: {
+        ok () {
+            this.$Message.info('Clicked ok');
+        },
+        cancel () {
+            this.$Message.info('Clicked cancel');
+        }
     }
 }
 /* eslint-disable */
