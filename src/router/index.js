@@ -4,7 +4,7 @@ import Farm from '@/farm/Farm'
 import Haha from '@/farm/Haha'
 
 Vue.use(Router)
-
+/* eslint-disable */
 export default new Router({
     routes: [
         {
@@ -19,3 +19,4 @@ export default new Router({
         }
     ]
 })
+/* eslint-disable */
