@@ -7,43 +7,21 @@
             <Button type="primary" @click="addLand = true">添加土地</Button>
         </div>
 
-
         <div class="plantpot" v-for="t in message">
             {{t}}
         </div>
 
-        <Modal
-            v-model="setting"
-            title="Common Modal dialog box title"
-            @on-ok="ok"
-            @on-cancel="cancel">
+        <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <p>我是弹窗</p>
-
         </Modal>
-
-        <Modal
-            v-model="unlock"
-            title="Common Modal dialog box title"
-            @on-ok="ok"
-            @on-cancel="cancel">
+        <Modal v-model="unlock" title="植物解锁" @on-ok="ok" @on-cancel="cancel">
             <p>我是弹窗</p>
-
         </Modal>
-        <Modal
-            v-model="achievement"
-            title="Common Modal dialog box title"
-            @on-ok="ok"
-            @on-cancel="cancel">
+        <Modal v-model="achievement" title="成就" @on-ok="ok" @on-cancel="cancel">
             <p>我是弹窗</p>
-
         </Modal>
-        <Modal
-            v-model="addLand"
-            title="Common Modal dialog box title"
-            @on-ok="ok"
-            @on-cancel="cancel">
+        <Modal v-model="addLand" title="添加土地" @on-ok="ok" @on-cancel="cancel">
             <p>我是弹窗</p>
-
         </Modal>
     </div>
 </template>
