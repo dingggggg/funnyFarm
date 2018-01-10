@@ -3,7 +3,8 @@
       <div class = 'unclock-plant' >
           <i class = 'icon-close'>hahah</i>
       <div style = "positon:fixed;width:100px;height:200px">
-           <image src = "../assets/images/xiaomai.png"  />
+           <!-- <image src = "../assets/images/xiaomai.png"  /> -->
+           <img src="../assets/images/xiaomai.png">
       </div>
       </div>
   </div>

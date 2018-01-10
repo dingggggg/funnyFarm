@@ -6,7 +6,7 @@
             <Button type="primary" @click="achievement = true">成就</Button>
             <Button type="primary" @click="addLand = true">添加土地</Button>
         </div>
-        <img src="../assets/logo.png">
+        <!-- <img src="../assets/logo.png"> -->
         <div class="plants">
             <div class="plantpot" v-for="t in message">
                 <!-- {{t}} -->
