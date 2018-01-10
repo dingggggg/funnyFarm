@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
+// import Componentone from './components/componentone'
 import 'iview/dist/styles/iview.css'
 
 // Vue.use(VueRouter)
@@ -18,3 +19,7 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+// Vue.component('Componentone', {
+//     template: '<div>ssss</div>'
+// });

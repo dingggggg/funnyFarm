@@ -11,6 +11,7 @@
             <div class="plantpot" v-for="t in message">
                 <!-- {{t}} -->
             </div>
+            <Componentone></Componentone>
         </div>
 
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
@@ -30,6 +31,9 @@
 
 <script>
 /* eslint-disable */
+ // import Componentone from './components/Componentone.vue'
+import Vue from 'vue'
+import Componentone from '../components/componentone'
 var test = {
     message:[1,2,3,4,5,6,7],
     setting:false,
@@ -49,13 +53,14 @@ export default {
         cancel () {
             this.$Message.info('Clicked cancel');
         }
-    }
+    },
+    components:{Componentone}
 }
 /* eslint-disable */
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style >
 .plants {
     width: 800px;
     height: 400px;
