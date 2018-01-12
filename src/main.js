@@ -4,11 +4,14 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import iView from 'iview'
-// import Componentone from './components/componentone'
 import 'iview/dist/styles/iview.css'
+import Variable from './factory/Variable'
+import Action from './factory/Action'
 
 // Vue.use(VueRouter)
 Vue.use(iView)
+Vue.use(Variable)
+Vue.use(Action)
 
 Vue.config.productionTip = false
 
@@ -19,7 +22,3 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
-
-// Vue.component('Componentone', {
-//     template: '<div>ssss</div>'
-// });
