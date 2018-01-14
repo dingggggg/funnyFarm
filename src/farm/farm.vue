@@ -9,7 +9,7 @@
         <!-- <img src="../assets/logo.png"> -->
         <div class="plants">
             <div class="plantpot" v-for="t in message">
-                <!-- {{t}} --> 
+                <!-- {{t}} -->
             </div>
             <Componentone></Componentone>
         </div>
@@ -24,7 +24,7 @@
             <p>我是弹窗</p>
         </Modal>
         <Modal v-model="addLand" title="添加土地" @on-ok="ok" @on-cancel="cancel">
-            <p>我是弹窗</p>
+            <p>我是弹窗aaaa</p>
         </Modal>
     </div>
 </template>
