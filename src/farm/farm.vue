@@ -11,6 +11,7 @@
             <div class="plantpot" v-for="(t, index) in plants" v-on:mouseenter="planting($event,index)">
                 <Progress :id="'progress-' + index" class="progress" :percent="plants[index].percent" hide-info></Progress>
                 <div class="plant-img" :style="plants[index].index"></div>
+                <div class="animation-money" v-show="plants[index].endPlant" :class="{'active':plants[index].endPlant}">+1元</div>
             </div>
         </div>
         <span class="money">
@@ -41,7 +42,8 @@ import Componentone from '../components/componentone'
 var variable = {
     plants:[{
         index:0,
-        percent:0
+        percent:0,
+        endPlant:false
     }],
     setting:false,
     unlock:false,
@@ -50,7 +52,8 @@ var variable = {
     farmData:{
         plants:[{
             index:0,
-            percent:0
+            percent:0,
+            endPlant:false
         }],
         userInfo:{
             money:100,
@@ -77,9 +80,10 @@ export default {
     },
     methods: {
         init (){
+            var _this = this;
             setInterval(function (){
-                this.save();
-            },300000)
+                _this.save();
+            },60000)
         },
         ok () {
             this.$Message.info('Clicked ok');
@@ -115,6 +119,7 @@ export default {
             var _this = this;
             var plants = _this.farmData.plants;
             plants.forEach(function (m, i){
+                // _this.plants[i].endPlant = false;
                 if(_this.plants[index]){
                     var msg = _this.plants[index].index;
                 }
@@ -126,14 +131,18 @@ export default {
                     var process = document.getElementById('progress-'+index);
                     process.style.display = 'block';
                     var timer = setInterval(function(){
-                        console.log(_this.plants[index].percent)
                         _this.plants[index].percent += 10;
                         if(_this.plants[index].percent == 100){
                             setTimeout(function (){
                                 clearInterval(timer);
                                 _this.plants[i].index = m.index;
                                 _this.plants[i].percent = m.percent;
+                                _this.plants[i].endPlant = true;
+                                _this.farmData.userInfo.money += 1;
                                 process.style.display = 'none';
+                                setTimeout(function (){
+                                    _this.plants[i].endPlant = false;
+                                },1000)
                             },200)
                         }
                     }, 100);
@@ -209,6 +218,22 @@ export default {
             height: 50px;
             border: none;
         }
+        @keyframes myfirst
+        {
+            0%   {top:0px;}
+            100% {top:-50px;}
+        }
+        .animation-money {
+            color:#FF0000;
+            text-align: center;
+            margin-top: 20px;
+            position: absolute;
+            left: 20px;
+
+            &.active {
+                animation: myfirst 1s linear;
+            }
+        }
     }
 }
 .money {
@@ -235,6 +260,7 @@ export default {
         width: 80px;
         height: 80px;
         margin-left: calc(50% - 40px);
+        margin-top: 10px;
 
         .has-plants-name {
             position: relative;
