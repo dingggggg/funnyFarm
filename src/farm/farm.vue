@@ -7,9 +7,9 @@
             <Button type="primary" @click="addLand = true">添加土地</Button>
         </div>
         <div class="plants">
-            <div class="plantpot" v-for="(index, t) in message" v-on:mouseenter="planting($event,index)">
-                <Progress v-show="" class="progress" :percent="percent" hide-info></Progress>
-                <img src="" class="plant-img">
+            <div class="plantpot" v-for="(t, index) in plants" v-on:mouseenter="planting($event,index)">
+                <Progress v-show="t.percent > 0" class="progress" :percent="plants[index].percent" hide-info></Progress>
+                <div class="plant-img" :style="plants[index].index"></div>
             </div>
         </div>
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
@@ -33,12 +33,37 @@ import Vue from 'vue'
 import Componentone from '../components/componentone'
 
 var variable = {
-    message:[1,2,3,4,5,6,7],
+    plants:[{
+        index:0,
+        percent:0
+    },
+    {
+        index:1,
+        percent:0
+    },
+    {
+        index:2,
+        percent:0
+    }],
     setting:false,
     unlock:false,
     achievement:false,
     addLand:false,
-    percent:0
+    percent:0,
+    farmData:{
+        plants:[{
+            index:0,
+            percent:0
+        },
+        {
+            index:1,
+            percent:0
+        },
+        {
+            index:2,
+            percent:0
+        }]
+    }
 }
 
 export default {
@@ -54,20 +79,39 @@ export default {
             this.$Message.info('Clicked cancel');
         },
         planting (event, index){
-            var ele = event.target;
-            var img = ele.children[1];
+            var _this = this;
+            var plants = _this.farmData.plants;
+            plants.forEach(function (m, i){
+                if(_this.plants[index]){
+                    var msg = _this.plants[index].index;
+                }
+                if(msg == m.index){
+                    _this.plants[index].index = {
+                        background: 'url(static/images/tudou.png) no-repeat center center',
+                        backgroundSize: 'cover'
+                    }
+                    var timer = setInterval(function(){
+                        console.log(_this.plants[index].percent)
+                        _this.plants[index].percent += 1;
+                        // if(_this.plants[index].percent == 100){
+                        //     clearInterval(timer);
+                        //     _this.plants[i].index = m.index;
+                        //     _this.plants[i].percent = m.percent;
+                        // }
+                    }, 50);
+                    setTimeout(function (){
+                        clearInterval(timer);
+                        _this.plants[i].index = m.index;
+                        _this.plants[i].percent = m.percent;
+                    }, 5200)
+                }
+                // else{
+                //     _this.plants[i].index = m.index;
+                //     _this.plants[i].percent = m.percent;
+                // }
+            })
 
-            img.src = require('../assets/images/xiaomai.png');
-            variable.percent = 50;
-            console.log(index)
-            // var time = 1;
-            // var timer = setInterval(function (){
-            //     variable.percent += 1;
-            // },10)
-            // setTimeout(function (){
-            //     clearInterval(timer);
-            // },1000)
-
+            this.$forceUpdate()
         }
     },
     components:{Componentone}
