@@ -20,9 +20,7 @@
             <span class="has-plants" :style="{background: 'url(static/images/xiaomai.png) no-repeat center center',
                 backgroundSize: 'cover'}"><span class="has-plants-name">小麦</span></span>
         </div>
-        <div class="bg-body">
-
-        </div>
+        <div class="bg-body"></div>
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <Componentone></Componentone>
         </Modal>
@@ -74,7 +72,15 @@ export default {
     data: function (){
         return variable
     },
+    mounted(){
+        this.init();
+    },
     methods: {
+        init (){
+            setInterval(function (){
+                this.save();
+            },300000)
+        },
         ok () {
             this.$Message.info('Clicked ok');
         },
