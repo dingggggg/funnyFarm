@@ -4,13 +4,21 @@
             <Button type="primary" @click="setting = true">游戏设定</Button>
             <Button type="primary" @click="unlock = true">解锁植物</Button>
             <Button type="primary" @click="achievement = true">成就</Button>
-            <Button type="primary" @click="addLand = true">添加土地</Button>
+            <Button type="primary" @click="addLand()">添加土地(需{{farmData.userInfo.addLandNeedMoney}}元)</Button>
+            <Button type="primary" @click="save()">保存游戏</Button>
         </div>
         <div class="plants">
             <div class="plantpot" v-for="(t, index) in plants" v-on:mouseenter="planting($event,index)">
-                <Progress v-show="t.percent > 0" class="progress" :percent="plants[index].percent" hide-info></Progress>
+                <Progress :id="'progress-' + index" class="progress" :percent="plants[index].percent" hide-info></Progress>
                 <div class="plant-img" :style="plants[index].index"></div>
             </div>
+        </div>
+        <div class="foot">
+            <span class="money">
+                ￥{{farmData.userInfo.money}}元
+            </span>
+            <span class="has-plants" :style="{background: 'url(static/images/xiaomai.png) no-repeat center center',
+                backgroundSize: 'cover'}"><span class="has-plants-name">小麦</span></span>
         </div>
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <Componentone></Componentone>
@@ -20,9 +28,6 @@
         </Modal>
         <Modal v-model="achievement" title="成就" @on-ok="ok" @on-cancel="cancel">
             <p>我是弹窗</p>
-        </Modal>
-        <Modal v-model="addLand" title="添加土地" @on-ok="ok" @on-cancel="cancel">
-            <p>我是弹窗aaaa</p>
         </Modal>
     </div>
 </template>
@@ -36,33 +41,28 @@ var variable = {
     plants:[{
         index:0,
         percent:0
-    },
-    {
-        index:1,
-        percent:0
-    },
-    {
-        index:2,
-        percent:0
     }],
     setting:false,
     unlock:false,
     achievement:false,
-    addLand:false,
     percent:0,
     farmData:{
         plants:[{
             index:0,
             percent:0
-        },
-        {
-            index:1,
-            percent:0
-        },
-        {
-            index:2,
-            percent:0
-        }]
+        }],
+        userInfo:{
+            money:100,
+            addLandNeedMoney:1
+        }
+    }
+}
+if(window.localStorage){
+    var storage = window.localStorage;
+    if(storage.farmData){
+        var farmData = JSON.parse(storage.farmData);
+        variable.farmData = farmData;
+        variable.plants = JSON.parse(JSON.stringify(farmData.plants));
     }
 }
 
@@ -78,6 +78,30 @@ export default {
         cancel () {
             this.$Message.info('Clicked cancel');
         },
+        addLand (){
+            var length = this.plants.length;
+            if(this.farmData.userInfo.money > this.farmData.userInfo.addLandNeedMoney){
+                this.farmData.userInfo.money = this.farmData.userInfo.money - this.farmData.userInfo.addLandNeedMoney;
+                this.farmData.userInfo.addLandNeedMoney = Math.pow(2,length - 1);
+                this.plants.push({
+                    index:length,
+                    percent:0
+                })
+                this.farmData.plants.push({
+                    index:length,
+                    percent:0
+                })
+                this.$Message.info('购买成功！');
+            }else{
+                this.$Message.info('年轻人，你的钱不够啊');
+            }
+        },
+        save (){
+            if(window.localStorage){
+                window.localStorage.setItem('farmData',JSON.stringify(this.farmData))
+                this.$Message.info('保存成功!');
+            }
+        },
         planting (event, index){
             var _this = this;
             var plants = _this.farmData.plants;
@@ -87,23 +111,23 @@ export default {
                 }
                 if(msg == m.index){
                     _this.plants[index].index = {
-                        background: 'url(static/images/tudou.png) no-repeat center center',
+                        background: 'url(static/images/xiaomai.png) no-repeat center center',
                         backgroundSize: 'cover'
                     }
+                    var process = document.getElementById('progress-'+index);
+                    process.style.display = 'block';
                     var timer = setInterval(function(){
                         console.log(_this.plants[index].percent)
-                        _this.plants[index].percent += 1;
-                        // if(_this.plants[index].percent == 100){
-                        //     clearInterval(timer);
-                        //     _this.plants[i].index = m.index;
-                        //     _this.plants[i].percent = m.percent;
-                        // }
-                    }, 50);
-                    setTimeout(function (){
-                        clearInterval(timer);
-                        _this.plants[i].index = m.index;
-                        _this.plants[i].percent = m.percent;
-                    }, 5200)
+                        _this.plants[index].percent += 10;
+                        if(_this.plants[index].percent == 100){
+                            setTimeout(function (){
+                                clearInterval(timer);
+                                _this.plants[i].index = m.index;
+                                _this.plants[i].percent = m.percent;
+                                process.style.display = 'none';
+                            },200)
+                        }
+                    }, 100);
                 }
                 // else{
                 //     _this.plants[i].index = m.index;
@@ -151,6 +175,7 @@ export default {
         .progress {
             position: absolute;
             top:-3px;
+            display: none;
         }
         .plant-img {
             position: absolute;
@@ -159,6 +184,35 @@ export default {
             width: 50px;
             height: 50px;
             border: none;
+        }
+    }
+}
+.money {
+    font-size: 24px;
+    position: absolute;
+    bottom: 120px;
+}
+.foot {
+    position: absolute;
+    bottom: 0px;
+    height: 120px;
+    margin: 0;
+    left: calc(50%);
+
+    .has-plants {
+        position: relative;
+        text-align: center;
+        display: inline-block;
+        // background: url('../assets/images/xiaomai.png') no-repeat center center;
+        // background-size: cover;
+        width: 80px;
+        height: 80px;
+        // left: calc(50% - 40px);
+
+        .has-plants-name {
+            position: relative;
+            top: 80px;
+            text-align: center;
         }
     }
 }
