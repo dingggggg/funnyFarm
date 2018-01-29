@@ -1,5 +1,5 @@
 <template>
-    <div style="padding:10px">
+    <div class="farm">
         <div class="btn-group">
             <Button type="primary" @click="setting = true">游戏设定</Button>
             <Button type="primary" @click="unlock = true">解锁植物</Button>
@@ -13,12 +13,15 @@
                 <div class="plant-img" :style="plants[index].index"></div>
             </div>
         </div>
+        <span class="money">
+            ￥{{farmData.userInfo.money}}元
+        </span>
         <div class="foot">
-            <span class="money">
-                ￥{{farmData.userInfo.money}}元
-            </span>
             <span class="has-plants" :style="{background: 'url(static/images/xiaomai.png) no-repeat center center',
                 backgroundSize: 'cover'}"><span class="has-plants-name">小麦</span></span>
+        </div>
+        <div class="bg-body">
+
         </div>
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <Componentone></Componentone>
@@ -93,7 +96,7 @@ export default {
                 })
                 this.$Message.info('购买成功！');
             }else{
-                this.$Message.info('年轻人，你的钱不够啊');
+                this.$Message.info('穷逼滚蛋！');
             }
         },
         save (){
@@ -145,6 +148,21 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.bg-body {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: #b3d0e8;
+    z-index: -1;
+    left: 0;
+    top: 0;
+}
+.farm {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    // background: #b3d0e8;
+}
 .plants {
     width: 800px;
     height: 400px;
@@ -194,10 +212,13 @@ export default {
 }
 .foot {
     position: absolute;
+    width: 100%;
     bottom: 0px;
+    left: 0;
     height: 120px;
     margin: 0;
-    left: calc(50%);
+    background: white;
+    z-index: 10;
 
     .has-plants {
         position: relative;
@@ -207,7 +228,7 @@ export default {
         // background-size: cover;
         width: 80px;
         height: 80px;
-        // left: calc(50% - 40px);
+        margin-left: calc(50% - 40px);
 
         .has-plants-name {
             position: relative;
