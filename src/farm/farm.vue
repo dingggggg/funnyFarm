@@ -12,7 +12,6 @@
                 <img src="" class="plant-img">
             </div>
         </div>
-
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <Componentone></Componentone>
         </Modal>
