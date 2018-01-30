@@ -197,7 +197,6 @@ export default{
                 money = newStr+"万";
             }
             return money
-
         },
         unlock(event,index){
             var _this = this;
@@ -271,7 +270,8 @@ export default{
     .content{
         position:absolute;
         width:700px;
-        top:15%;right:27%;
+        top:15%;
+        left:calc(50% - 350px);
         padding:0;
     }
     .item{
