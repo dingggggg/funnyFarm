@@ -23,9 +23,9 @@
             v-for="(plant, index) in unlockPlants" v-bind:data="plant" v-bind:key="plant.name">
                 <div slot="content">
                     <p>植物：{{transformForPlant(plant.name)}}</p>
-                    <p>成本：{{plant.cost}}</p>
-                    <p>收益：{{plant.profit}}</p>
-                    <p>度速: {{plant.speed}}</p>
+                    <p>成本：{{transformForMillion(plant.cost)}}元</p>
+                    <p>收益：{{transformForMillion(plant.profit)}}元</p>
+                    <p>度速: {{plant.speed}}秒</p>
                     <p>季节：{{farmData.currentSeason.now}}</p>
                     <p>已种植次数：{{farmData.currentSeason.now}}</p>
                 </div>
@@ -36,18 +36,15 @@
         <div class="bg-body" :class="{'bg-spring':farmData.currentSeason.bgSpring, 'bg-summer':farmData.currentSeason.bgSummer,
         'bg-automn':farmData.currentSeason.bgAutomn, 'bg-winter':farmData.currentSeason.bgWinter}"></div>
         <UnlockPlant v-show="unlock"></UnlockPlant>
+        <Achievement v-show="achievement"></Achievement>
     </div>
 </template>
 
 <script>
 /* eslint-disable */
 import Vue from 'vue'
-<<<<<<< HEAD
-import Componentone from '../components/componentone'
-import unClockplant from './unclockplant'
-=======
 import UnlockPlant from '../components/UnlockPlant'
->>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8
+import Achievement from '../components/achievement'
 
 var variable = {
     plants:[{
@@ -301,14 +298,23 @@ export default {
                     break;
             }
             return name;
+        },
+        transformForMillion(money){
+            if(money >= 10000){
+                var str = money.toString();
+                var length = str.length;
+                var newStr = '';
+                for(var i=0;i<str.length;i++){
+                    if(i < length - 4){
+                        newStr += str[i];
+                    }
+                }
+                money = newStr+"万";
+            }
+            return money
         }
 
-    },
-<<<<<<< HEAD
-    components:{Componentone,unClockplant}
-=======
-    components:{UnlockPlant}
->>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8
+    },components:{UnlockPlant,Achievement}
 }
 /* eslint-disable */
 </script>
