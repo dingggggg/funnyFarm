@@ -1,7 +1,12 @@
 <template>
     <div >
+<<<<<<< HEAD:src/farm/unclockplant.vue
         <div class = 'unlock-plant' v-if = "false">
             <canvas id = 'canvas' class = 'icon-close' @click = "closeUnlock()"></canvas>
+=======
+        <div class = 'unlock-plant'>
+            <canvas id = 'canvas' class = 'icon-close' v-on:click="showUnlock()"></canvas>
+>>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8:src/components/unlockPlant.vue
             <div class = 'content'>
             <div class = 'item' v-for = "(item, index) in items">
                 <div class = 'image'>
@@ -44,7 +49,10 @@ if(window.localStorage){
 }
 var data = {
     farmData:farmData,
+<<<<<<< HEAD:src/farm/unclockplant.vue
     isClose:false,
+=======
+>>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8:src/components/unlockPlant.vue
     items: [{
         name:'tomato',
         cost:4,
@@ -145,12 +153,23 @@ var data = {
 }
 
 export default{
+<<<<<<< HEAD:src/farm/unclockplant.vue
     name:'unClockplant',
+=======
+    name: 'UnlockPlant',
+>>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8:src/components/unlockPlant.vue
     data: function(){
         return  data;
     },
+    created(){
+        var _this = this;
+        _this.$root.eventHub.$on('END_OPEN', function (p){
+            _this.$root.eventHub.$emit('GET_UNLOCK_PLANTS_PARAMS', _this.items);
+        })
+    },
     mounted(){
-        this.drawx();
+        var _this = this;
+        _this.drawx();
     },
     methods:{
         drawx(){
@@ -203,7 +222,6 @@ export default{
                     break;
             }
             return name;
-
         },
         transformForMillion(money){
             if(money >= 10000){
@@ -281,6 +299,7 @@ export default{
                 this.items[index].showProfit = !this.items[index].showProfit;
             }
         },
+<<<<<<< HEAD:src/farm/unclockplant.vue
         enterShowSpeed (index){
             if(this._isUnlock(index, 'profit')){
                 this.items[index].showSpeed = !this.items[index].showSpeed;
@@ -293,6 +312,10 @@ export default{
         },
         closeUnlock(){
 
+=======
+        showUnlock (){
+            this.$root.eventHub.$emit('HIDE_UNLOCK');
+>>>>>>> 5ba95733900885a82a14f1dfb24691a9fb78d3b8:src/components/unlockPlant.vue
         }
 
     }
