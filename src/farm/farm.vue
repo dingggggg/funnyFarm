@@ -10,8 +10,8 @@
         <div class="plants">
             <div class="plantpot" v-for="(t, index) in plants" v-on:mouseenter="planting($event,index)">
                 <Progress :id="'progress-' + index" class="progress" :percent="plants[index].percent" hide-info></Progress>
-                <div class="plant-img" :style="plants[index].index"></div>
-                <div class="animation-money" v-show="plants[index].endPlant" :class="{'active':plants[index].endPlant}">+1元</div>
+                <div class="plant-img" :class="{'active': plants[index].plantAnimation}" :style="plants[index].index"></div>
+                <div class="animation-money" :id="'moneyAnimation-' + index" :class="{'active':plants[index].moneyAnimation}">+1元</div>
             </div>
         </div>
         <span class="money">
@@ -21,15 +21,10 @@
             <span class="has-plants" :style="{background: 'url(static/images/xiaomai.png) no-repeat center center',
                 backgroundSize: 'cover'}"><span class="has-plants-name">小麦</span></span>
         </div>
-        <div class="bg-body"></div>
+        <div class="bg-body" :class="{'bg-spring':farmData.currentSeason.bgSpring, 'bg-summer':farmData.currentSeason.bgSummer,
+        'bg-automn':farmData.currentSeason.bgAutomn, 'bg-winter':farmData.currentSeason.bgWinter}"></div>
         <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
             <Componentone></Componentone>
-        </Modal>
-        <Modal v-model="unlock" title="植物解锁" @on-ok="ok" @on-cancel="cancel">
-            <p>我是弹窗</p>
-        </Modal>
-        <Modal v-model="achievement" title="成就" @on-ok="ok" @on-cancel="cancel">
-            <p>我是弹窗</p>
         </Modal>
     </div>
 </template>
@@ -43,21 +38,29 @@ var variable = {
     plants:[{
         index:0,
         percent:0,
-        endPlant:false
+        moneyAnimation:false,
+        plantAnimation:false
     }],
     setting:false,
     unlock:false,
     achievement:false,
-    percent:0,
     farmData:{
         plants:[{
             index:0,
             percent:0,
-            endPlant:false
+            moneyAnimation:false,
+            plantAnimation:false
         }],
         userInfo:{
             money:100,
             addLandNeedMoney:1
+        },
+        currentSeason: {
+            now:'spring',
+            bgSpring:true,
+            bgSummer:false,
+            bgAutomn:false,
+            bgWinter:false
         }
     }
 }
@@ -80,10 +83,20 @@ export default {
     },
     methods: {
         init (){
+            console.log(this)
             var _this = this;
             setInterval(function (){
                 _this.save();
             },60000)
+            if(_this.farmData.currentSeason.now === 'spring'){
+                _this.$Notice.info({
+                    title: '春天开始啦!*\( ^ v ^ )/*'
+                });
+            }
+            setInterval(function (){
+                _this.changeSeason(_this.farmData.currentSeason.now);
+                _this.save();
+            },300000)
         },
         ok () {
             this.$Message.info('Clicked ok');
@@ -104,22 +117,26 @@ export default {
                     index:length,
                     percent:0
                 })
-                this.$Message.info('购买成功！');
+                this.$Message.success('购买成功！');
             }else{
-                this.$Message.info('穷逼滚蛋！');
+                this.$Message.warning('穷逼滚蛋！');
             }
         },
         save (){
             if(window.localStorage){
-                window.localStorage.setItem('farmData',JSON.stringify(this.farmData))
-                this.$Message.info('保存成功!');
+                window.localStorage.setItem('farmData',JSON.stringify(this.farmData));
+                this.$Notice.success({
+                    title: '保存成功!'
+                });
             }
         },
         planting (event, index){
             var _this = this;
             var plants = _this.farmData.plants;
+            var progress = document.getElementById('progress-'+index);
+            var moneyAnimation = document.getElementById('moneyAnimation-'+index);
             plants.forEach(function (m, i){
-                // _this.plants[i].endPlant = false;
+                // _this.plants[i].moneyAnimation = false;
                 if(_this.plants[index]){
                     var msg = _this.plants[index].index;
                 }
@@ -128,32 +145,102 @@ export default {
                         background: 'url(static/images/xiaomai.png) no-repeat center center',
                         backgroundSize: 'cover'
                     }
-                    var process = document.getElementById('progress-'+index);
-                    process.style.display = 'block';
+                    progress.style.display = 'block';
+
                     var timer = setInterval(function(){
                         _this.plants[index].percent += 10;
+                        _this.plants[index].plantAnimation = true;
+                        setTimeout(function (){
+                            _this.plants[index].plantAnimation = false;
+                        },500)
                         if(_this.plants[index].percent == 100){
                             setTimeout(function (){
                                 clearInterval(timer);
                                 _this.plants[i].index = m.index;
                                 _this.plants[i].percent = m.percent;
-                                _this.plants[i].endPlant = true;
+                                _this.plants[i].moneyAnimation = true;
+                                moneyAnimation.style.display = 'block';
                                 _this.farmData.userInfo.money += 1;
-                                process.style.display = 'none';
+                                progress.style.display = 'none';
                                 setTimeout(function (){
-                                    _this.plants[i].endPlant = false;
+                                    // _this.$nextTick(function () {
+                                       // _this.plants[i].moneyAnimation = false;
+                                    // });
+                                    moneyAnimation.style.display = 'none';
                                 },1000)
                             },200)
                         }
                     }, 100);
                 }
-                // else{
-                //     _this.plants[i].index = m.index;
-                //     _this.plants[i].percent = m.percent;
-                // }
             })
+            this.$forceUpdate();
+        },
+        changeSeason (season){
+            var _this = this;
 
-            this.$forceUpdate()
+            switch (season) {
+                case 'spring':
+                    _this.farmData.currentSeason.now = 'summer';
+                    _this.showSeason(season);
+                    this.$Notice.info({
+                        title: '夏天开始啦!( +_+ )'
+                    });
+                    break;
+                case 'summer':
+                    _this.farmData.currentSeason.now = 'automn';
+                    _this.showSeason(season);
+                    this.$Notice.info({
+                        title: '秋天开始啦!(~^O^~)'
+                    });
+                    break;
+                case 'automn':
+                    _this.farmData.currentSeason.now = 'winter';
+                    _this.showSeason(season);
+                    this.$Notice.info({
+                        title: '冬天开始啦!( ¯▽¯；)'
+                    });
+                    break;
+                case 'winter':
+                    _this.farmData.currentSeason.now = 'spring';
+                    _this.showSeason(season);
+                    this.$Notice.info({
+                        title: '春天开始啦!*\( ^ v ^ )/*'
+                    });
+                    break;
+                default:
+                    break;
+            }
+        },
+        showSeason (season){
+            var _this = this;
+            switch (season) {
+                case 'spring':
+                    _this.farmData.currentSeason.bgSummer = true;
+                    _this.farmData.currentSeason.bgAutomn = false;
+                    _this.farmData.currentSeason.bgWinter = false;
+                    _this.farmData.currentSeason.bgSpring = false;
+                    break;
+                case 'summer':
+                    _this.farmData.currentSeason.bgSummer = true;
+                    _this.farmData.currentSeason.bgAutomn = false;
+                    _this.farmData.currentSeason.bgWinter = false;
+                    _this.farmData.currentSeason.bgSpring = false;
+                    break;
+                case 'automn':
+                    _this.farmData.currentSeason.bgSummer = false;
+                    _this.farmData.currentSeason.bgAutomn = true;
+                    _this.farmData.currentSeason.bgWinter = false;
+                    _this.farmData.currentSeason.bgSpring = false;
+                    break;
+                case 'winter':
+                    _this.farmData.currentSeason.bgSummer = false;
+                    _this.farmData.currentSeason.bgAutomn = false;
+                    _this.farmData.currentSeason.bgWinter = true;
+                    _this.farmData.currentSeason.bgSpring = false;
+                    break;
+                default:
+                    break;
+            }
         }
     },
     components:{Componentone}
@@ -167,10 +254,23 @@ export default {
     width: 100%;
     height: 100%;
     position: absolute;
-    background: #b3d0e8;
     z-index: -1;
     left: 0;
     top: 0;
+    transition: background-color 1s;
+
+    &.bg-winter {
+        background: #b3d0e8;
+    }
+    &.bg-spring {
+        background: #b3e8b3;
+    }
+    &.bg-summer {
+        background: #e8b3b3;
+    }
+    &.bg-automn {
+        background: #e8dcb3;
+    }
 }
 .farm {
     width: 100%;
@@ -217,8 +317,21 @@ export default {
             width: 50px;
             height: 50px;
             border: none;
+
+            @keyframes plant
+            {
+                0%   {width: 50px;height: 50px}
+                25%  {width: 55px;height: 55px}
+                50%  {width: 45px;height: 45px}
+                75%  {width: 60px;height: 60px}
+                100% {width: 50px;height: 50px}
+            }
+            &.active {
+                animation: plant 0.5s linear;
+            }
         }
-        @keyframes myfirst
+
+        @keyframes addMoney
         {
             0%   {top:0px;}
             100% {top:-50px;}
@@ -229,9 +342,10 @@ export default {
             margin-top: 20px;
             position: absolute;
             left: 20px;
+            display: none;
 
             &.active {
-                animation: myfirst 1s linear;
+                animation: addMoney 1s linear;
             }
         }
     }
