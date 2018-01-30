@@ -1,7 +1,7 @@
 <template>
     <div >
         <div class = 'unlock-plant'>
-            <canvas id = 'canvas' class = 'icon-close' ></canvas>
+            <canvas id = 'canvas' class = 'icon-close' v-on:click="showUnlock()"></canvas>
             <div class = 'content'>
             <div class = 'item' v-for = "(item, index) in items">
                 <div class = 'image'>
@@ -42,7 +42,6 @@ if(window.localStorage){
 }
 var data = {
     farmData:farmData,
-
     items: [{
         name:'tomato',
         cost:4,
@@ -119,11 +118,19 @@ var data = {
 }
 
 export default{
+    name: 'UnlockPlant',
     data: function(){
         return  data;
     },
+    created(){
+        var _this = this;
+        _this.$root.eventHub.$on('END_OPEN', function (p){
+            _this.$root.eventHub.$emit('GET_UNLOCK_PLANTS_PARAMS', _this.items);
+        })
+    },
     mounted(){
-        this.drawx();
+        var _this = this;
+        _this.drawx();
     },
     methods:{
         drawx(){
@@ -176,7 +183,6 @@ export default{
                     break;
             }
             return name;
-
         },
         transformForMillion(money){
             if(money >= 10000){
@@ -236,6 +242,9 @@ export default{
             if(this._isUnlock(index, 'profit')){
                 this.items[index].showProfit = !this.items[index].showProfit;
             }
+        },
+        showUnlock (){
+            this.$root.eventHub.$emit('HIDE_UNLOCK');
         }
 
     }

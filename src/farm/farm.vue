@@ -18,21 +18,30 @@
             ￥{{farmData.userInfo.money}}元
         </span>
         <div class="foot">
-            <span class="has-plants" :style="{background: 'url(static/images/xiaomai.png) no-repeat center center',
-                backgroundSize: 'cover'}"><span class="has-plants-name">小麦</span></span>
+            <Tooltip v-show="!plant.isUnlock" class="tooltip" placement="top"
+            v-for="(plant, index) in unlockPlants" v-bind:data="plant" v-bind:key="plant.name">
+                <div slot="content">
+                    <p>植物：{{transformForPlant(plant.name)}}</p>
+                    <p>成本：{{plant.cost}}</p>
+                    <p>收益：{{plant.profit}}</p>
+                    <p>度速: {{plant.speed}}</p>
+                    <p>季节：{{farmData.currentSeason.now}}</p>
+                    <p>已种植次数：{{farmData.currentSeason.now}}</p>
+                </div>
+                <span class="has-plants" :style="{background: 'url(' + plant.image + ') no-repeat center center',
+                    backgroundSize: 'cover'}"><span class="has-plants-name">{{plant.name}}</span></span>
+            </Tooltip>
         </div>
         <div class="bg-body" :class="{'bg-spring':farmData.currentSeason.bgSpring, 'bg-summer':farmData.currentSeason.bgSummer,
         'bg-automn':farmData.currentSeason.bgAutomn, 'bg-winter':farmData.currentSeason.bgWinter}"></div>
-        <Modal v-model="setting" title="游戏设置" @on-ok="ok" @on-cancel="cancel">
-            <Componentone></Componentone>
-        </Modal>
+        <UnlockPlant v-show="unlock"></UnlockPlant>
     </div>
 </template>
 
 <script>
 /* eslint-disable */
 import Vue from 'vue'
-import Componentone from '../components/componentone'
+import UnlockPlant from '../components/UnlockPlant'
 
 var variable = {
     plants:[{
@@ -44,6 +53,7 @@ var variable = {
     setting:false,
     unlock:false,
     achievement:false,
+    unlockPlants:{},
     farmData:{
         plants:[{
             index:0,
@@ -78,13 +88,26 @@ export default {
     data: function (){
         return variable
     },
+    created (){
+        var _this = this;
+        _this.$root.eventHub.$on('GET_UNLOCK_PLANTS_PARAMS', function (params){
+            _this.unlockPlants = params;
+        })
+    },
     mounted(){
-        this.init();
+        console.log(this)
+        var _this = this;
+        _this.$root.eventHub.$emit('END_OPEN',1);
+        _this.init();
+
+        _this.$root.eventHub.$on('HIDE_UNLOCK', function (){
+            _this.unlock = false;
+        })
     },
     methods: {
         init (){
-            console.log(this)
             var _this = this;
+
             setInterval(function (){
                 _this.save();
             },60000)
@@ -241,9 +264,41 @@ export default {
                 default:
                     break;
             }
+        },
+        transformForPlant (name){
+            switch(name){
+                case 'tomato':
+                    name = '西红柿';
+                    break;
+                case 'wheat':
+                    name = '小麦';
+                    break;
+                case 'radish':
+                    name = '萝卜';
+                    break;
+                case 'cabbage':
+                    name = '白菜';
+                    break;
+                case 'potato':
+                    name = '土豆';
+                    break;
+                case 'peas':
+                    name = '豌豆';
+                    break;
+                case 'sugarCane':
+                    name = '甘蔗';
+                    break;
+                case 'greenPepper':
+                    name = '青椒';
+                    break;
+                default:
+                    break;
+            }
+            return name;
         }
+
     },
-    components:{Componentone}
+    components:{UnlockPlant}
 }
 /* eslint-disable */
 </script>
@@ -365,6 +420,9 @@ export default {
     background: white;
     z-index: 10;
 
+    .tooltip {
+        margin-left: calc(50% - 40px);
+    }
     .has-plants {
         position: relative;
         text-align: center;
@@ -373,7 +431,6 @@ export default {
         // background-size: cover;
         width: 80px;
         height: 80px;
-        margin-left: calc(50% - 40px);
         margin-top: 10px;
 
         .has-plants-name {
