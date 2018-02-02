@@ -34,24 +34,9 @@
 
 <script>
 /* eslint-disable */
-if(window.localStorage){
-    var storage = window.localStorage;
-    if(storage.farmData){
-        var farmData = JSON.parse(storage.farmData);
-    }
-}
+
 var data = {
-    farmData:farmData,
     items: [{
-        name:'tomato',
-        cost:4,
-        profit:16,
-        speed:2,
-        unlock:500,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/xihongshi.png'
-    },{
         name:'wheat',
         cost:0,
         profit:1,
@@ -59,43 +44,58 @@ var data = {
         unlock:0,
         isUnlock:false,
         showProfit:false,
-        image:'../static/images/xiaomai.png'
+        image:'../static/images/wheat.png',
+        plantTimes:0
+    },{
+        name:'tomato',
+        cost:1,
+        profit:1,
+        speed:2,
+        unlock:1,
+        isUnlock:true,
+        showProfit:false,
+        image:'../static/images/tomato.png',
+        plantTimes:0
     },{
         name:'radish',
-        cost:20,
-        profit:80,
-        speed:4,
-        unlock:8000,
+        cost:1,
+        profit:1,
+        speed:3,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/luobo.png'
+        image:'../static/images/radish.png',
+        plantTimes:0
     },{
         name:'cabbage',
-        cost:200,
-        profit:800,
-        speed:6,
-        unlock:40000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/baicai.png'
+        image:'../static/images/cabbage.png',
+        plantTimes:0
     },{
         name:'potato',
-        cost:2000,
-        profit:10000,
-        speed:8,
-        unlock:400000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/tudou.png'
+        image:'../static/images/potato.png',
+        plantTimes:0
     },{
         name:'peas',
-        cost:10000,
-        profit:60000,
-        speed:10,
-        unlock:5000000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/wandou.png'
+        image:'../static/images/peas.png',
+        plantTimes:0
     },{
         name:'sugarCane',
         cost:100000,
@@ -104,7 +104,8 @@ var data = {
         unlock:100000000,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/ganzhe.png'
+        image:'../static/images/sugarCane.png',
+        plantTimes:0
     },{
         name: 'greenPepper',
         cost: 1000000,
@@ -113,8 +114,20 @@ var data = {
         unlock: 999999999,
         isUnlock:true,
         showProfit:false,
-        image:'../static/images/qingjiao.png'
+        image:'../static/images/greenPepper.png',
+        plantTimes:0
     }]
+}
+
+if(window.localStorage){
+    var storage = window.localStorage;
+    if(storage.farmData){
+        var farmData = JSON.parse(storage.farmData);
+        data = {
+            farmData: farmData,
+            items: farmData.unlockPlants
+        }
+    }
 }
 
 export default{
@@ -200,10 +213,11 @@ export default{
         },
         unlock(event,index){
             var _this = this;
-            console.log(_this.items[index].unlock);
+            console.log(_this.farmData);
             var target = event.target;
             if(_this.farmData.userInfo.money > _this.items[index].unlock){
                 _this.items[index].isUnlock = false;
+                _this.$root.eventHub.$emit('SAVE',_this.items);
             }else{
                 this.$Message.info('穷逼滚蛋！');
             }
@@ -211,11 +225,13 @@ export default{
         addProfit(event,index){
             if(this._isUnlock(index)){
                 this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
+                _this.$root.eventHub.$emit('SAVE');
             }
         },
         addSpeed(event,index){
             if(this._isUnlock(index)){
                 this.items[index].speed = (this.items[index].speed-0.2).toFixed(2);
+                _this.$root.eventHub.$emit('SAVE');
             }
         },
         _isUnlock(index, item){
