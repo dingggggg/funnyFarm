@@ -22,6 +22,33 @@ export default{
             isShow: false
         }
     },
+    mounted(){
+        var _this = this;
+
+        var timer = setInterval(function (){
+            // if(_this.rains.length > 0){
+                // _this.rains.forEach(function (r, i){
+                    var ele = document.createElement('span');
+                    document.body.appendChild(ele);
+                    ele.classList.add("rain");
+                    ele.style.position = 'absolute';
+                    ele.style.left = Math.random()* 1300 + 'px';
+                    ele.style.top = 0;
+                    ele.style.border = '2px solid red';
+                    ele.style.height = Math.random()*30 + 20 + 'px';
+                    ele.style.transition = 'top 1.5s linear';
+                    // ele.style.transitionDelay = '0.5s';
+
+                    setTimeout(function (){
+                        ele.style.top = 'calc(100% - 100px)';
+                    },50)
+                    setTimeout(function (){
+                        document.body.removeChild(ele);
+                    },1500)
+                // })
+            // }
+        },50)
+    },
     methods:{
         changeIsShow(){
             this.isShow = true;
