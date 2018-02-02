@@ -36,6 +36,8 @@
 
 <script>
 /* eslint-disable */
+import Vue from 'vue'
+
 if(window.localStorage){
     var storage = window.localStorage;
     if(storage.farmData){
@@ -230,19 +232,20 @@ export default{
             var _this = this;
             //console.log(_this.items[index].unlock);
             var target = event.target;
-            if(_this.farmData.userInfo.money > _this.items[index].unlock){
+            if(_this.variable.userMoney > _this.items[index].unlock){
                 _this.items[index].isUnlock = false;
-                _this.farmData.userInfo.money = _this.farmData.userInfo.money-_this.items[index].unlock;
+                _this.variable.userMoney = _this.variable.userMoney-_this.items[index].unlock;
             }else{
                 this.$Message.info('穷逼滚蛋！');
             }
         },
         addProfit(event,index){
             if(this._isUnlock(index)){
-                if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
+                if(this.variable.userMoney >= this.items[index].addProfitMoney){
                     this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
-                    this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addProfitMoney;
+                    this.variable.userMoney = this.variable.userMoney - this.items[index].addProfitMoney;
                     this.items[index].addProfitMoney = (this.items[index].addProfitMoney*1.4).toFixed(2);
+                    this.$root.eventHub.$emit('REFRESH_MONEY', this.variable.userMoney);
                 }else{
                     this.$Message.info('穷逼滚蛋！');
                 }
@@ -251,10 +254,11 @@ export default{
         addSpeed(event,index){
             if(this._isUnlock(index)){
                 if(this.items[index].speed>0.5){
-                    if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
+                    if(this.variable.userMoney >= this.items[index].addSpeedMoney){
                         this.items[index].speed = (this.items[index].speed-0.1).toFixed(2);
-                        this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addSpeedMoney;
+                        this.variable.userMoney = this.variable.userMoney - this.items[index].addSpeedMoney;
                         this.items[index].addSpeedMoney = (this.items[index].addSpeedMoney*1.4).toFixed(2);
+                        console.log(this.variable.userMoney);
                     }else{
                         this.$Message.info('穷逼滚蛋！');
                     }

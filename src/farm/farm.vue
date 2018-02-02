@@ -16,20 +16,21 @@
         </div>
         <span class="money">
             ￥{{farmData.userInfo.money}}元
+            <!-- ￥{{(variable.userMoney).toFixed(2)}}元 -->
         </span>
         <div class="foot">
             <Tooltip v-show="!plant.isUnlock" class="tooltip" placement="top"
-            v-for="(plant, index) in unlockPlants" v-bind:data="plant" v-bind:key="plant.name">
+            v-for="(plant, index) in farmData.unlockPlants" v-bind:data="plant" v-bind:key="plant.name">
                 <div slot="content">
                     <p>植物：{{transformForPlant(plant.name)}}</p>
                     <p>成本：{{transformForMillion(plant.cost)}}元</p>
                     <p>收益：{{transformForMillion(plant.profit)}}元</p>
-                    <p>度速: {{plant.speed}}秒</p>
+                    <p>速度: {{plant.speed}}秒</p>
                     <p>季节：{{farmData.currentSeason.now}}</p>
                     <p>已种植次数：{{farmData.currentSeason.now}}</p>
                 </div>
                 <span class="has-plants" :style="{background: 'url(' + plant.image + ') no-repeat center center',
-                    backgroundSize: 'cover'}"><span class="has-plants-name">{{plant.name}}</span></span>
+                    backgroundSize: 'cover'}"><span class="has-plants-name">{{transformForPlant(plant.name)}}</span></span>
             </Tooltip>
         </div>
         <div class="bg-body" :class="{'bg-spring':farmData.currentSeason.bgSpring, 'bg-summer':farmData.currentSeason.bgSummer,
@@ -45,6 +46,7 @@ import Vue from 'vue'
 import UnlockPlant from '../components/UnlockPlant'
 import Achievement from '../components/achievement'
 
+
 var variable = {
     plants:[{
         index:0,
@@ -55,7 +57,6 @@ var variable = {
     setting:false,
     unlock:false,
     achievement:false,
-    unlockPlants:{},
     farmData:{
         plants:[{
             index:0,
@@ -73,7 +74,8 @@ var variable = {
             bgSummer:false,
             bgAutomn:false,
             bgWinter:false
-        }
+        },
+        unlockPlants:{},
     }
 }
 if(window.localStorage){
@@ -93,11 +95,11 @@ export default {
     created (){
         var _this = this;
         _this.$root.eventHub.$on('GET_UNLOCK_PLANTS_PARAMS', function (params){
-            _this.unlockPlants = params;
+            _this.farmData.unlockPlants = params;
         })
     },
     mounted(){
-        console.log(this)
+        console.log(this);
         var _this = this;
         _this.$root.eventHub.$emit('END_OPEN',1);
         _this.init();
@@ -105,6 +107,14 @@ export default {
         _this.$root.eventHub.$on('HIDE_UNLOCK', function (){
             _this.unlock = false;
         })
+
+        _this.$root.eventHub.$on('REFRESH_MONEY', function (params){
+            console.log(params)
+            if(params){
+                // _this.farmData.userInfo.money = params;
+                _this.variable.userMoney = params;
+            }
+        });
     },
     methods: {
         init (){
@@ -130,11 +140,12 @@ export default {
             this.$Message.info('Clicked cancel');
         },
         addLand (){
+            var _this = this;
             var length = this.plants.length;
-            if(this.farmData.userInfo.money > this.farmData.userInfo.addLandNeedMoney){
-                this.farmData.userInfo.money = this.farmData.userInfo.money - this.farmData.userInfo.addLandNeedMoney;
-                this.farmData.userInfo.addLandNeedMoney = Math.pow(2,length - 1);
-                this.plants.push({
+            if(_this.variable.userMoney > this.farmData.userInfo.addLandNeedMoney){
+                _this.variable.userMoney = _this.variable.userMoney - _this.farmData.userInfo.addLandNeedMoney;
+                _this.farmData.userInfo.addLandNeedMoney = Math.pow(2,length - 1);
+                _this.plants.push({
                     index:length,
                     percent:0
                 })
@@ -148,12 +159,20 @@ export default {
             }
         },
         save (){
-            if(window.localStorage){
-                window.localStorage.setItem('farmData',JSON.stringify(this.farmData));
+            // if(window.localStorage){
+            //     window.localStorage.setItem('farmData',JSON.stringify(this.farmData));
+            //     this.$Notice.success({
+            //         title: '保存成功!'
+            //     });
+            // }
+            this.farmData.userInfo.money = this.variable.userMoney;
+            if(this.action.save(this.farmData)){
+
                 this.$Notice.success({
                     title: '保存成功!'
                 });
             }
+
         },
         planting (event, index){
             var _this = this;
@@ -185,7 +204,7 @@ export default {
                                 _this.plants[i].percent = m.percent;
                                 _this.plants[i].moneyAnimation = true;
                                 moneyAnimation.style.display = 'block';
-                                _this.farmData.userInfo.money += 1;
+                                _this.variable.userMoney += 1;
                                 progress.style.display = 'none';
                                 setTimeout(function (){
                                     // _this.$nextTick(function () {
