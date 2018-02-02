@@ -118,7 +118,6 @@ export default {
 
         _this.$root.eventHub.$on('SAVE', function (params){
             _this.farmData.unlockPlants = params;
-            console.log(_this.farmData.unlockPlants)
             _this.save();
         });
     },

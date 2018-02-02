@@ -38,7 +38,34 @@
 /* eslint-disable */
 
 var data = {
-    farmData:farmData,
+    farmData:{
+        plants:[{
+            index:0,
+            percent:0,
+            moneyAnimation:false,
+            plantAnimation:false
+        }],
+        userInfo:{
+            money:100,
+            addLandNeedMoney:1
+        },
+        currentSeason: {
+            now:'spring',
+            bgColor:'#b3e8b3'
+        },
+        unlockPlants:{},
+        currentPlant:{
+            name:'wheat',
+            cost:0,
+            profit:1,
+            speed:1,
+            unlock:0,
+            isUnlock:false,
+            showProfit:false,
+            image:'../static/images/wheat.png',
+            plantTimes:0
+        }
+    },
     isClose:false,
     items: [{
         name:'wheat',
@@ -133,9 +160,11 @@ if(window.localStorage){
     var storage = window.localStorage;
     if(storage.farmData){
         var farmData = JSON.parse(storage.farmData);
-        data = {
-            farmData: farmData,
-            items: farmData.unlockPlants
+        if(farmData){
+            data = {
+                farmData: farmData,
+                items: farmData.unlockPlants
+            }
         }
     }
 }
