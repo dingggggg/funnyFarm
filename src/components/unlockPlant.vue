@@ -20,9 +20,11 @@
                 <!-- control start -->
                 <div class = 'control'>
                     <button type = 'button' class = ' btn-profit ivu-btn' @click = "addProfit($event,index)" @mouseenter="enterShowProfit(index)" @mouseleave="leaveShowPRofit(index)">
-                        <span v-show="!item.showProfit">+收益</span><span v-show="item.showProfit">需要</span>
+                        <span v-show="!item.showProfit">+收益</span><span v-show="item.showProfit">需要{{item.addProfitMoney}}</span>
                     </button>
-                    <button type = 'button' class = ' btn-prosee ivu-btn' @click = "addSpeed($event,index)">+速度</button>
+                    <button type = 'button' class = ' btn-prosee ivu-btn' @click = "addSpeed($event,index)" @mouseenter="enterShowSpeed(index)" @mouseleave="leaveShowSpeed(index)">
+                        <span v-show="!item.showSpeed">+速度</span><span v-show="item.showSpeed">需要{{item.addSpeedMoney}}</span>
+                    </button>
                 </div>
                 <!-- control end -->
 
@@ -36,11 +38,15 @@
 /* eslint-disable */
 
 var data = {
+    farmData:farmData,
+    isClose:false,
     items: [{
         name:'wheat',
         cost:0,
         profit:1,
+        addProfitMoney:100,
         speed:1,
+        addSpeedMoney:10,
         unlock:0,
         isUnlock:false,
         showProfit:false,
@@ -100,7 +106,9 @@ var data = {
         name:'sugarCane',
         cost:100000,
         profit:1000000,
+        addProfitMoney:100,
         speed:11,
+        addSpeedMoney:100,
         unlock:100000000,
         isUnlock:true,
         showProfit:false,
@@ -110,7 +118,9 @@ var data = {
         name: 'greenPepper',
         cost: 1000000,
         profit: 5000000,
+        addProfitMoney:100,
         speed: 12,
+        addSpeedMoney:100,
         unlock: 999999999,
         isUnlock:true,
         showProfit:false,
@@ -210,13 +220,14 @@ export default{
                 money = newStr+"万";
             }
             return money
+
         },
         unlock(event,index){
             var _this = this;
-            console.log(_this.farmData);
             var target = event.target;
             if(_this.farmData.userInfo.money > _this.items[index].unlock){
                 _this.items[index].isUnlock = false;
+                _this.farmData.userInfo.money = _this.farmData.userInfo.money-_this.items[index].unlock;
                 _this.$root.eventHub.$emit('SAVE',_this.items);
             }else{
                 this.$Message.info('穷逼滚蛋！');
@@ -224,14 +235,30 @@ export default{
         },
         addProfit(event,index){
             if(this._isUnlock(index)){
-                this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
-                _this.$root.eventHub.$emit('SAVE');
+                if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
+                    this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
+                    this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addProfitMoney;
+                    this.items[index].addProfitMoney = (this.items[index].addProfitMoney*1.4).toFixed(2);
+                    _this.$root.eventHub.$emit('SAVE');
+                }else{
+                    this.$Message.info('穷逼滚蛋！');
+                }
             }
         },
         addSpeed(event,index){
             if(this._isUnlock(index)){
-                this.items[index].speed = (this.items[index].speed-0.2).toFixed(2);
-                _this.$root.eventHub.$emit('SAVE');
+                if(this.items[index].speed>0.5){
+                    if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
+                        this.items[index].speed = (this.items[index].speed-0.1).toFixed(2);
+                        this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addSpeedMoney;
+                        this.items[index].addSpeedMoney = (this.items[index].addSpeedMoney*1.4).toFixed(2);
+                        _this.$root.eventHub.$emit('SAVE');
+                    }else{
+                        this.$Message.info('穷逼滚蛋！');
+                    }
+                }else{
+                    this.$Message.info('速度0.5还不够？要不要这么贪！！');
+                }
             }
         },
         _isUnlock(index, item){
@@ -256,6 +283,16 @@ export default{
         leaveShowPRofit (index){
             if(this._isUnlock(index, 'profit')){
                 this.items[index].showProfit = !this.items[index].showProfit;
+            }
+        },
+        enterShowSpeed (index){
+            if(this._isUnlock(index, 'profit')){
+                this.items[index].showSpeed = !this.items[index].showSpeed;
+            }
+        },
+        leaveShowSpeed (index){
+            if(this._isUnlock(index, 'profit')){
+                this.items[index].showSpeed = !this.items[index].showSpeed;
             }
         },
         showUnlock (){
@@ -286,8 +323,7 @@ export default{
     .content{
         position:absolute;
         width:700px;
-        top:15%;
-        left:calc(50% - 350px);
+        top:15%;right:27%;
         padding:0;
     }
     .item{
@@ -330,13 +366,14 @@ export default{
       margin-top:10px;
     }
     .ivu-btn{
+        width: 132px;
         margin-bottom: 0;
         font-weight: 400;
         text-align: center;
         cursor: pointer;
         line-height: 1.5;
         user-select: none;
-        padding: 6px 50px;
+        padding: 6px;
         font-size: 12px;
         border-radius: 4px;
         transition: color .2s linear,background-color .2s linear,border .2s linear;

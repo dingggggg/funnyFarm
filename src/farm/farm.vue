@@ -7,6 +7,7 @@
             <Button type="primary" @click="addLand()">添加土地(需{{farmData.userInfo.addLandNeedMoney}}元)</Button>
             <Button type="primary" @click="save()">保存游戏</Button>
         </div>
+        <unClockplant></unClockplant>
         <div class="plants">
             <div class="plantpot" v-for="(t, index) in plants" v-on:mouseenter="planting($event,index)">
                 <Progress :id="'progress-' + index" class="progress" :percent="plants[index].percent" hide-info></Progress>
@@ -330,8 +331,7 @@ export default {
             return money
         }
 
-    },
-    components:{UnlockPlant,Achievement}
+    },components:{UnlockPlant,Achievement}
 }
 /* eslint-disable */
 </script>
