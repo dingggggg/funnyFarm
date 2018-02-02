@@ -36,30 +36,38 @@
 
 <script>
 /* eslint-disable */
-import Vue from 'vue'
 
-if(window.localStorage){
-    var storage = window.localStorage;
-    if(storage.farmData){
-        var farmData = JSON.parse(storage.farmData);
-    }
-}
 var data = {
-    farmData:farmData,
+    farmData:{
+        plants:[{
+            index:0,
+            percent:0,
+            moneyAnimation:false,
+            plantAnimation:false
+        }],
+        userInfo:{
+            money:100,
+            addLandNeedMoney:1
+        },
+        currentSeason: {
+            now:'spring',
+            bgColor:'#b3e8b3'
+        },
+        unlockPlants:{},
+        currentPlant:{
+            name:'wheat',
+            cost:0,
+            profit:1,
+            speed:1,
+            unlock:0,
+            isUnlock:false,
+            showProfit:false,
+            image:'../static/images/wheat.png',
+            plantTimes:0
+        }
+    },
     isClose:false,
     items: [{
-        name:'tomato',
-        cost:4,
-        profit:16,
-        addProfitMoney:100,
-        speed:2,
-        addSpeedMoney:100,
-        unlock:500,
-        isUnlock:true,
-        showProfit:false,
-        showSpeed:false,
-        image:'../static/images/xihongshi.png'
-    },{
         name:'wheat',
         cost:0,
         profit:1,
@@ -69,56 +77,58 @@ var data = {
         unlock:0,
         isUnlock:false,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/xiaomai.png'
+        image:'../static/images/wheat.png',
+        plantTimes:0
+    },{
+        name:'tomato',
+        cost:1,
+        profit:1,
+        speed:2,
+        unlock:1,
+        isUnlock:true,
+        showProfit:false,
+        image:'../static/images/tomato.png',
+        plantTimes:0
     },{
         name:'radish',
-        cost:20,
-        profit:80,
-        addProfitMoney:100,
-        speed:4,
-        addSpeedMoney:100,
-        unlock:8000,
+        cost:1,
+        profit:1,
+        speed:3,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/luobo.png'
+        image:'../static/images/radish.png',
+        plantTimes:0
     },{
         name:'cabbage',
-        cost:200,
-        profit:800,
-        addProfitMoney:100,
-        speed:6,
-        addSpeedMoney:100,
-        unlock:40000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/baicai.png'
+        image:'../static/images/cabbage.png',
+        plantTimes:0
     },{
         name:'potato',
-        cost:2000,
-        profit:10000,
-        addProfitMoney:100,
-        speed:8,
-        addSpeedMoney:100,
-        unlock:400000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/tudou.png'
+        image:'../static/images/potato.png',
+        plantTimes:0
     },{
         name:'peas',
-        cost:10000,
-        profit:60000,
-        addProfitMoney:100,
-        speed:10,
-        addSpeedMoney:100,
-        unlock:5000000,
+        cost:1,
+        profit:1,
+        speed:1,
+        unlock:1,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/wandou.png'
+        image:'../static/images/peas.png',
+        plantTimes:0
     },{
         name:'sugarCane',
         cost:100000,
@@ -129,8 +139,8 @@ var data = {
         unlock:100000000,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/ganzhe.png'
+        image:'../static/images/sugarCane.png',
+        plantTimes:0
     },{
         name: 'greenPepper',
         cost: 1000000,
@@ -141,9 +151,22 @@ var data = {
         unlock: 999999999,
         isUnlock:true,
         showProfit:false,
-        showSpeed:false,
-        image:'../static/images/qingjiao.png'
+        image:'../static/images/greenPepper.png',
+        plantTimes:0
     }]
+}
+
+if(window.localStorage){
+    var storage = window.localStorage;
+    if(storage.farmData){
+        var farmData = JSON.parse(storage.farmData);
+        if(farmData){
+            data = {
+                farmData: farmData,
+                items: farmData.unlockPlants
+            }
+        }
+    }
 }
 
 export default{
@@ -230,22 +253,22 @@ export default{
         },
         unlock(event,index){
             var _this = this;
-            //console.log(_this.items[index].unlock);
             var target = event.target;
-            if(_this.variable.userMoney > _this.items[index].unlock){
+            if(_this.farmData.userInfo.money > _this.items[index].unlock){
                 _this.items[index].isUnlock = false;
-                _this.variable.userMoney = _this.variable.userMoney-_this.items[index].unlock;
+                _this.farmData.userInfo.money = _this.farmData.userInfo.money-_this.items[index].unlock;
+                _this.$root.eventHub.$emit('SAVE',_this.items);
             }else{
                 this.$Message.info('穷逼滚蛋！');
             }
         },
         addProfit(event,index){
             if(this._isUnlock(index)){
-                if(this.variable.userMoney >= this.items[index].addProfitMoney){
+                if(this.farmData.userInfo.money >= this.items[index].addProfitMoney){
                     this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
-                    this.variable.userMoney = this.variable.userMoney - this.items[index].addProfitMoney;
+                    this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addProfitMoney;
                     this.items[index].addProfitMoney = (this.items[index].addProfitMoney*1.4).toFixed(2);
-                    this.$root.eventHub.$emit('REFRESH_MONEY', this.variable.userMoney);
+                    _this.$root.eventHub.$emit('SAVE');
                 }else{
                     this.$Message.info('穷逼滚蛋！');
                 }
@@ -254,11 +277,11 @@ export default{
         addSpeed(event,index){
             if(this._isUnlock(index)){
                 if(this.items[index].speed>0.5){
-                    if(this.variable.userMoney >= this.items[index].addSpeedMoney){
+                    if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
                         this.items[index].speed = (this.items[index].speed-0.1).toFixed(2);
-                        this.variable.userMoney = this.variable.userMoney - this.items[index].addSpeedMoney;
+                        this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addSpeedMoney;
                         this.items[index].addSpeedMoney = (this.items[index].addSpeedMoney*1.4).toFixed(2);
-                        console.log(this.variable.userMoney);
+                        _this.$root.eventHub.$emit('SAVE');
                     }else{
                         this.$Message.info('穷逼滚蛋！');
                     }
