@@ -1,5 +1,5 @@
 <template>
-    <div style = 'width:100%;height:100%;position:absolute;'>
+    <div id ='haha' style = 'background-color:#b3e8b3;width:100%;height:100%;position:absolute;z-index:-3;overflow:hidden;'>
         <div class = 'bg-summer' :class = "{showSun:isShow}">
             <div class = 'circle'></div>
             <div class = 'circle-1'></div>
@@ -10,21 +10,55 @@
             </div>
         </div>
         <button @click = 'changeIsShow()' >taiyang</button>
+        <div class="rain" :class="{rain1:r.isRain}" :style="{left: r.left+'%'}" v-for = "r in rainLine"></div>
     </div>
 </template>
 
 <script>
 /* eslint-disable */
+import Vue from 'vue'
+
+var data = {
+    isShow: false,
+    rainLine: [{
+        left:  Math.random() * 100,
+        isRain: false
+    }]
+}
 export default{
     name:'bgBody',
     data: function(){
-        return {
-            isShow: false
-        }
+        return data
+    },
+    mounted(){
+        var i = 0;
+        var j = 0;
+        var _this = this;
+        var timer = setInterval(function(){
+            _this.rainLine[i].isRain = true;
+            i = i + 1;
+            if(i === 19){
+                _this.rainLine.splice(j,1);
+                i = 18;
+                console.log(i);
+            };
+            _this.rainLine.push({
+                left: Math.random() * 100
+            });
+        },50);
     },
     methods:{
         changeIsShow(){
-            this.isShow = true;
+            if(this.isShow === true){
+                this.isShow = false;
+            }else{
+                this.isShow = true;
+            }
+            if(this.isRain === true){
+                this.isRain = false;
+            }else{
+                this.isRain = true;
+            }
         }
     }
 }
@@ -108,6 +142,29 @@ export default{
 }
 @keyframes sun {
     100%{transform: rotate(360deg);}
+}
+.rain {
+    width: 2px;
+    height:40px;
+    background-color: #fff;
+    position: absolute;
+    top: 0;
+    left: 10px;
+    transition: top 1s linear;
+}
+.rain1{
+    top:100%;
+}
+.leaf{
+    top: 100px;
+    left: 200px;
+    width: 100px;
+    height: 50px;
+    border-radius: 95% 5% 100% 0;
+    background-color: orange;
+    position: fixed;
+    -webkit-animation: leaves1 10s infinite ease-in-out;
+    animation: leaves1 10s infinite ease-in-out;
 }
 
 </style>
