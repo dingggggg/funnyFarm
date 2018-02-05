@@ -3,7 +3,7 @@
         <div class = 'unlock-plant'>
             <canvas id = 'canvas' class = 'icon-close' v-on:click="showUnlock()"></canvas>
             <div class = 'content'>
-            <div class = 'item' v-for = "(item, index) in items">
+            <div class = 'item' v-for = "(item, index) in $store.state.farmData.unlockPlants">
                 <div class = 'image'>
                     <img v-bind:src="item.image"  draggable = 'false' class = 'plant'>
                     <div v-show="item.isUnlock" class='lock' :id="'lock'+index" @click = "unlock($event,index)"></div>
@@ -37,148 +37,10 @@
 <script>
 /* eslint-disable */
 
-var data = {
-    farmData:{
-        plants:[{
-            index:0,
-            percent:0,
-            moneyAnimation:false,
-            plantAnimation:false
-        }],
-        userInfo:{
-            money:100,
-            addLandNeedMoney:1
-        },
-        currentSeason: {
-            now:'spring',
-            bgColor:'#b3e8b3'
-        },
-        unlockPlants:{},
-        currentPlant:{
-            name:'wheat',
-            cost:0,
-            profit:1,
-            speed:1,
-            unlock:0,
-            isUnlock:false,
-            showProfit:false,
-            image:'../static/images/wheat.png',
-            plantTimes:0
-        }
-    },
-    isClose:false,
-    items: [{
-        name:'wheat',
-        cost:0,
-        profit:1,
-        addProfitMoney:100,
-        speed:1,
-        addSpeedMoney:10,
-        unlock:0,
-        isUnlock:false,
-        showProfit:false,
-        image:'../static/images/wheat.png',
-        plantTimes:0
-    },{
-        name:'tomato',
-        cost:1,
-        profit:1,
-        speed:2,
-        unlock:1,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/tomato.png',
-        plantTimes:0
-    },{
-        name:'radish',
-        cost:1,
-        profit:1,
-        speed:3,
-        unlock:1,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/radish.png',
-        plantTimes:0
-    },{
-        name:'cabbage',
-        cost:1,
-        profit:1,
-        speed:1,
-        unlock:1,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/cabbage.png',
-        plantTimes:0
-    },{
-        name:'potato',
-        cost:1,
-        profit:1,
-        speed:1,
-        unlock:1,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/potato.png',
-        plantTimes:0
-    },{
-        name:'peas',
-        cost:1,
-        profit:1,
-        speed:1,
-        unlock:1,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/peas.png',
-        plantTimes:0
-    },{
-        name:'sugarCane',
-        cost:100000,
-        profit:1000000,
-        addProfitMoney:100,
-        speed:11,
-        addSpeedMoney:100,
-        unlock:100000000,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/sugarCane.png',
-        plantTimes:0
-    },{
-        name: 'greenPepper',
-        cost: 1000000,
-        profit: 5000000,
-        addProfitMoney:100,
-        speed: 12,
-        addSpeedMoney:100,
-        unlock: 999999999,
-        isUnlock:true,
-        showProfit:false,
-        image:'../static/images/greenPepper.png',
-        plantTimes:0
-    }]
-}
-
-if(window.localStorage){
-    var storage = window.localStorage;
-    if(storage.farmData){
-        var farmData = JSON.parse(storage.farmData);
-        if(farmData){
-            data = {
-                farmData: farmData,
-                items: farmData.unlockPlants
-            }
-        }
-    }
-}
-
 export default{
     name: 'UnlockPlant',
     data: function(){
-        return  data;
-    },
-    created(){
-        var _this = this;
-        _this.$root.eventHub.$on('END_OPEN', function (p){
-            _this.$root.eventHub.$emit('GET_UNLOCK_PLANTS_PARAMS', _this.items);
-        })
+        return  {};
     },
     mounted(){
         var _this = this;
@@ -254,45 +116,65 @@ export default{
         unlock(event,index){
             var _this = this;
             var target = event.target;
-            if(_this.farmData.userInfo.money > _this.items[index].unlock){
-                _this.items[index].isUnlock = false;
-                _this.farmData.userInfo.money = _this.farmData.userInfo.money-_this.items[index].unlock;
-                _this.$root.eventHub.$emit('SAVE',_this.items);
+            if(_this.$store.state.farmData.userInfo.money > _this.$store.state.farmData.unlockPlants[index].unlock){
+                _this.$store.state.farmData.unlockPlants[index].isUnlock = false;
+                _this.$store.state.farmData.userInfo.money = _this.$store.state.farmData.userInfo.money-_this.$store.state.farmData.unlockPlants[index].unlock;
+
+                if(_this.$store.getters.save){
+                    _this.$Notice.success({
+                        title: '保存成功!'
+                    });
+                }
             }else{
                 this.$Message.info('穷逼滚蛋！');
             }
         },
         addProfit(event,index){
             if(this._isUnlock(index)){
-                if(this.farmData.userInfo.money >= this.items[index].addProfitMoney){
-                    this.items[index].profit = (this.items[index].profit*1.01).toFixed(2);
-                    this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addProfitMoney;
-                    this.items[index].addProfitMoney = (this.items[index].addProfitMoney*1.4).toFixed(2);
-                    _this.$root.eventHub.$emit('SAVE');
+                if(this.$store.state.farmData.unlockPlants[index].profit < this.$store.state.farmData.unlockPlants[index].cost * 4){
+                    if(this.$store.state.farmData.userInfo.money >= this.$store.state.farmData.unlockPlants[index].addProfitMoney){
+                        this.$store.state.farmData.unlockPlants[index].profit = Number((this.$store.state.farmData.unlockPlants[index].profit + (this.$store.state.farmData.unlockPlants[index].cost * 4) / 10).toFixed(2));
+                        this.$store.state.farmData.userInfo.money = Number((this.$store.state.farmData.userInfo.money - this.$store.state.farmData.unlockPlants[index].addProfitMoney).toFixed(2));
+                        this.$store.state.farmData.unlockPlants[index].addProfitMoney = Number((this.$store.state.farmData.unlockPlants[index].addProfitMoney * (index + 1)).toFixed(2));
+                        var _this =this;
+                        if(_this.$store.getters.save){
+                            _this.$Notice.success({
+                                title: '保存成功!'
+                            });
+                        }
+                    }else{
+                        this.$Message.error('穷逼滚蛋！');
+                    }
                 }else{
-                    this.$Message.info('穷逼滚蛋！');
+                    this.$Message.error('收益达到上限');
                 }
             }
         },
         addSpeed(event,index){
             if(this._isUnlock(index)){
-                if(this.items[index].speed>0.5){
-                    if(this.farmData.userInfo.money >= this.items[index].addSpeedMoney){
-                        this.items[index].speed = (this.items[index].speed-0.1).toFixed(2);
-                        this.farmData.userInfo.money = this.farmData.userInfo.money - this.items[index].addSpeedMoney;
-                        this.items[index].addSpeedMoney = (this.items[index].addSpeedMoney*1.4).toFixed(2);
-                        _this.$root.eventHub.$emit('SAVE');
+                if(this.$store.state.farmData.unlockPlants[index].speed > (index+1)/2){
+                    if(this.$store.state.farmData.userInfo.money >= this.$store.state.farmData.unlockPlants[index].addSpeedMoney){
+                        this.$store.state.farmData.unlockPlants[index].speed = Number((this.$store.state.farmData.unlockPlants[index].speed - (index + 1) / 20).toFixed(2));
+                        this.$store.state.farmData.userInfo.money = Number((this.$store.state.farmData.userInfo.money - this.$store.state.farmData.unlockPlants[index].addSpeedMoney).toFixed(2));
+                        this.$store.state.farmData.unlockPlants[index].addSpeedMoney = Number((this.$store.state.farmData.unlockPlants[index].addSpeedMoney * (index + 1)).toFixed(2));
+
+                        var _this =this;
+                        if(_this.$store.getters.save){
+                            _this.$Notice.success({
+                                title: '保存成功!'
+                            });
+                        }
                     }else{
-                        this.$Message.info('穷逼滚蛋！');
+                        this.$Message.error('穷逼滚蛋！');
                     }
                 }else{
-                    this.$Message.info('速度0.5还不够？要不要这么贪！！');
+                    this.$Message.error('速度达到上限');
                 }
             }
         },
         _isUnlock(index, item){
             var a = false;
-            if(this.items[index].isUnlock){
+            if(this.$store.state.farmData.unlockPlants[index].isUnlock){
                 if(item === 'profit'){
                     return
                 }else{
@@ -306,26 +188,26 @@ export default{
         },
         enterShowProfit (index){
             if(this._isUnlock(index, 'profit')){
-                this.items[index].showProfit = !this.items[index].showProfit;
+                this.$store.state.farmData.unlockPlants[index].showProfit = !this.$store.state.farmData.unlockPlants[index].showProfit;
             }
         },
         leaveShowPRofit (index){
             if(this._isUnlock(index, 'profit')){
-                this.items[index].showProfit = !this.items[index].showProfit;
+                this.$store.state.farmData.unlockPlants[index].showProfit = !this.$store.state.farmData.unlockPlants[index].showProfit;
             }
         },
         enterShowSpeed (index){
             if(this._isUnlock(index, 'profit')){
-                this.items[index].showSpeed = !this.items[index].showSpeed;
+                this.$store.state.farmData.unlockPlants[index].showSpeed = !this.$store.state.farmData.unlockPlants[index].showSpeed;
             }
         },
         leaveShowSpeed (index){
             if(this._isUnlock(index, 'profit')){
-                this.items[index].showSpeed = !this.items[index].showSpeed;
+                this.$store.state.farmData.unlockPlants[index].showSpeed = !this.$store.state.farmData.unlockPlants[index].showSpeed;
             }
         },
         showUnlock (){
-            this.$root.eventHub.$emit('HIDE_UNLOCK');
+            this.$store.state.unlock = false;
         }
 
     }

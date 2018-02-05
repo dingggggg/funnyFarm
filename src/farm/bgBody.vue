@@ -10,7 +10,7 @@
             </div>
         </div>
         <button @click = 'changeIsShow()' >taiyang</button>
-        <div class="rain" :class="{rain1:r.isRain}" :style="{left: r.left+'%'}" v-for = "r in rainLine"></div>
+        <div class="rain" :class="{'rain1':r.isRain}" :style="{'left': r.left+'%'}" v-for = "r in rainLine"></div>
     </div>
 </template>
 
@@ -20,6 +20,7 @@ import Vue from 'vue'
 
 var data = {
     isShow: false,
+    index: 0,
     rainLine: [{
         left:  Math.random() * 100,
         isRain: false
@@ -31,48 +32,31 @@ export default{
         return data
     },
     mounted(){
-        var i = 0;
-        var j = 0;
-        var _this = this;
-        var timer = setInterval(function(){
-            _this.rainLine[i].isRain = true;
-            i = i + 1;
-            if(i === 19){
-                _this.rainLine.splice(j,1);
-                i = 18;
-                console.log(i);
-            };
-            _this.rainLine.push({
-                left: Math.random() * 100
-            });
-        },50);
-    },
-    mounted(){
-        var _this = this;
-
-        var timer = setInterval(function (){
-            // if(_this.rains.length > 0){
-                // _this.rains.forEach(function (r, i){
-                    var ele = document.createElement('span');
-                    document.body.appendChild(ele);
-                    ele.classList.add("rain");
-                    ele.style.position = 'absolute';
-                    ele.style.left = Math.random()* 1300 + 'px';
-                    ele.style.top = 0;
-                    ele.style.border = '2px solid red';
-                    ele.style.height = Math.random()*30 + 20 + 'px';
-                    ele.style.transition = 'top 1.5s linear';
-                    // ele.style.transitionDelay = '0.5s';
-
-                    setTimeout(function (){
-                        ele.style.top = 'calc(100% - 100px)';
-                    },50)
-                    setTimeout(function (){
-                        document.body.removeChild(ele);
-                    },1500)
-                // })
-            // }
-        },50)
+        // var _this = this;
+        //
+        // var timer = setInterval(function (){
+        //     // if(_this.rains.length > 0){
+        //         // _this.rains.forEach(function (r, i){
+        //             var ele = document.createElement('span');
+        //             document.body.appendChild(ele);
+        //             ele.classList.add("rain");
+        //             ele.style.position = 'absolute';
+        //             ele.style.left = Math.random()* 1300 + 'px';
+        //             ele.style.top = 0;
+        //             ele.style.border = '2px solid red';
+        //             ele.style.height = Math.random()*30 + 20 + 'px';
+        //             ele.style.transition = 'top 1.5s linear';
+        //             // ele.style.transitionDelay = '0.5s';
+        //
+        //             setTimeout(function (){
+        //                 ele.style.top = 'calc(100% - 100px)';
+        //             },50)
+        //             setTimeout(function (){
+        //                 document.body.removeChild(ele);
+        //             },1500)
+        //         // })
+        //     // }
+        // },50)
     },
     methods:{
         changeIsShow(){
