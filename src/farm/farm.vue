@@ -123,23 +123,23 @@ export default {
                 var currentSeason = _this.$store.state.farmData.currentSeason.now;
                 var plants = _this.$store.state.farmData.unlockPlants;
                 _this.changeSeason(currentSeason);
-                plants.forEach(function (p, i){
-                    var profit = JSON.parse(JSON.stringify(p.profit));
-                    if(currentSeason === 'automn'){
-                        p.profit = p.profit * 1.3;
-                        setTimeout(function (){
-                            p.profit = profit;
-                        }, 299900);
-                    }else if(currentSeason === 'winter' || currentSeason === 'summer'){
-                        p.profit = p.profit * 0.7;
-                        setTimeout(function (){
-                            p.profit = profit;
-                        }, 299900);
-                    }else{
-                        p.profit = profit;
-                    }
-                })
-                _this.save(true);
+                // plants.forEach(function (p, i){
+                //     var profit = JSON.parse(JSON.stringify(p.profit));
+                //     if(currentSeason === 'automn'){
+                //         p.profit = p.profit * 1.3;
+                //         setTimeout(function (){
+                //             p.profit = profit;
+                //         }, 299900);
+                //     }else if(currentSeason === 'winter' || currentSeason === 'summer'){
+                //         p.profit = p.profit * 0.7;
+                //         setTimeout(function (){
+                //             p.profit = profit;
+                //         }, 299900);
+                //     }else{
+                //         p.profit = profit;
+                //     }
+                // })
+                // _this.save(true);
             },300000)
         },
         addLand (){
