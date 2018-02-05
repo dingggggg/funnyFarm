@@ -120,15 +120,27 @@ export default {
                 });
             }
             setInterval(function (){
-                _this.changeSeason(_this.$store.state.farmData.currentSeason.now);
+                var currentSeason = _this.$store.state.farmData.currentSeason.now;
+                var plants = _this.$store.state.farmData.unlockPlants;
+                _this.changeSeason(currentSeason);
+                plants.forEach(function (p, i){
+                    var profit = JSON.parse(JSON.stringify(p.profit));
+                    if(currentSeason === 'automn'){
+                        p.profit = p.profit * 1.3;
+                        setTimeout(function (){
+                            p.profit = profit;
+                        }, 299900);
+                    }else if(currentSeason === 'winter' || currentSeason === 'summer'){
+                        p.profit = p.profit * 0.7;
+                        setTimeout(function (){
+                            p.profit = profit;
+                        }, 299900);
+                    }else{
+                        p.profit = profit;
+                    }
+                })
                 _this.save(true);
             },300000)
-        },
-        ok () {
-            this.$Message.info('Clicked ok');
-        },
-        cancel () {
-            this.$Message.info('Clicked cancel');
         },
         addLand (){
             var _this = this;
@@ -237,7 +249,7 @@ export default {
                     _this.$store.state.farmData.currentSeason.now = 'winter';
                     _this.showSeason(season);
                     this.$Notice.info({
-                        title: '冬天开始啦!( ¯▽¯；)'
+                        title: '冬天开始啦!( ¯▽¯ )'
                     });
                     break;
                 case 'winter':
